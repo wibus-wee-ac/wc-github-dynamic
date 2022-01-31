@@ -2,13 +2,10 @@ import { html, css, LitElement } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 
 /**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
+ * A github dynamic element
  */
-@customElement('my-element')
-export class MyElement extends LitElement {
+@customElement('github-dynamic')
+export class GithubDynamic extends LitElement {
   static styles = css`
     :host {
       display: block;
@@ -51,6 +48,6 @@ export class MyElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-element': MyElement
+    'github-dynamic': GithubDynamic
   }
 }
