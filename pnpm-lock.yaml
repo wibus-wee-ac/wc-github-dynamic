@@ -4,6 +4,7 @@ specifiers:
   '@custom-elements-manifest/analyzer': ^0.5.7
   '@custom-elements-manifest/to-markdown': ^0.1.0
   '@yunyoujun/utils': ^0.1.4
+  axios: ^0.25.0
   esno: ^0.14.0
   fs: ^0.0.1-security
   lit: ^2.0.2
@@ -13,6 +14,7 @@ specifiers:
   vite: ^2.7.2
 
 dependencies:
+  axios: 0.25.0
   lit: 2.1.2
 
 devDependencies:
@@ -164,6 +166,14 @@ packages:
     transitivePeerDependencies:
       - debug
     dev: true
+
+  /axios/0.25.0:
+    resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
+    dependencies:
+      follow-redirects: 1.14.7
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /bail/1.0.5:
     resolution: {integrity: sha512-xFbRxM1tahm08yHBP16MMjVUAvDaBMD38zsM9EMAUN61omwLmKlOpB/Zku5QkjZ8TZ4vn53pj+t518cH0S03RQ==}
@@ -724,7 +734,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
 
   /fs/0.0.1-security:
     resolution: {integrity: sha1-invTcYa23d84E/I4WLV+yq9eQdQ=}

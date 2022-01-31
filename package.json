@@ -27,6 +27,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "axios": "^0.25.0",
     "lit": "^2.0.2"
   },
   "devDependencies": {
