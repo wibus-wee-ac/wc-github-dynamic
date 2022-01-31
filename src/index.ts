@@ -45,8 +45,8 @@ export class GithubDynamic extends LitElement {
     return data[i]
   }
 
-  private async getStatus(i: number){
-    return await this.getData(i).then((res) => { 
+  private async getStatus(data: Promise<any>){
+    return await data.then((res) => { 
     let emoji: string = "🙂";
     
     switch (res ? res.type : '') {
@@ -200,18 +200,19 @@ a {
 
   private renderHTML(i: number){
     const bgTheme = {background: this.bgColor}
+    const data = this.getData(i).then((res) => {return res})
     return html`
       <div class="single-post panel box-shadow-wrap-normal" style=${styleMap(bgTheme)}>
   <div class="post-meta wrapper-lg"><div class="item-meta-ico bg-ico-emoji">
-    ${until(this.getStatus(i))}
+    ${until(this.getStatus(data))}
   </div>    
   <h2 class="m-t-none text-ellipsis index-post-title" style=${styleMap({color: this.titleColor})}>
-    <a href="${until(this.getData(i).then((res) => {return res ? res.repo.url:'#'}), "Loading")}">
-    ${until(this.getData(i).then((res) => {return res ? res.type:'Null'}), "Loading")}
+    <a href="${until(data.then((res) => {return res ? res.repo.url:'#'}), "Loading")}">
+    ${until(data.then((res) => {return res ? res.type:'Null'}), "Loading")}
       </a>
     </h2>
     <p class="summary l-h-2x" style=${styleMap({color: this.descriptionColor})}>
-    ${until(this.getData(i).then((res) => {
+    ${until(data.then((res) => {
       switch (res ? res.type : ''){
         case "PushEvent":
           return res.payload.commits[0].message
@@ -239,11 +240,11 @@ a {
 <div class="post-item-foot-icon text-ellipsis list-inline" style=${styleMap({color: this.descriptionColor})}>
 <li>
 <span class="m-r-sm right-small-icons"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-<a href="https://www.ihewro.com/author/1/">${until(this.getData(i).then((res) => {return res ? res.repo.name:'Null'}), "Loading")}</a>
+<a href="https://www.ihewro.com/author/1/">${until(data.then((res) => {return res ? res.repo.name:'Null'}), "Loading")}</a>
 </li>
 
 <li><span class="right-small-icons m-r-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
-${until(this.getData(i).then((res) => {return res ? res.created_at:'Null'}), "Loading")}
+${until(data.then((res) => {return res ? res.created_at:'Null'}), "Loading")}
 </li>
 </div><!--post-meta wrapper-lg-->
 </div>
