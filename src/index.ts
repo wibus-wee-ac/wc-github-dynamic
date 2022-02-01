@@ -238,6 +238,7 @@ a {
 
   private renderHTML(i: number){
     const bgTheme = {background: this.bgColor}
+    this.getCookie('github-dynamic') ? this.getCookie('github-dynamic') : this.getData()
     const data = this.getCookie('github-dynamic')
     return html`
       <div class="single-post panel box-shadow-wrap-normal" style=${styleMap(bgTheme)}>
@@ -269,7 +270,6 @@ ${data[i].created_at}
   }
 
   render() {
-    console.log(this.getData())
     let a: TemplateResult<1>[] = new Array(this.limit)
     for (let i = 0; i < this.limit; i++) {
       if (this.renderHTML(i) == null) {
