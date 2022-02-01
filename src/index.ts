@@ -2,6 +2,7 @@ import { html, css, LitElement, TemplateResult } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import {styleMap} from 'lit/directives/style-map.js';
 import $ from 'axios'
+import Cookies from 'js-cookie'
 import {until} from 'lit/directives/until.js';
 
 /**
@@ -9,79 +10,6 @@ import {until} from 'lit/directives/until.js';
  */
 @customElement('github-dynamic')
 export class GithubDynamic extends LitElement {
-
-  /**
-   * the github username
-   */
-   @property({type: String})
-   username = "wibus-wee"
- 
-   /**
-    * limit number
-    */
-   @property({type: Number})
-   limit = 10
- 
-   /**
-    * set background color
-    */
-   @property({type: String})
-   bgColor = "#fafafa"
-
-  /**
-   * set title color
-   */
-  @property({type: String})
-  titleColor = "#555"
-
-  /**
-   * set description color
-   */
-  @property({type: String})
-  descriptionColor = "#8b8b8b"
-
-  private async getData(i:number){
-    const { data } = await $.get(`https://api.github.com/users/${this.username}/events?per_page=${this.limit}`)
-    return data[i]
-  }
-
-  private async getStatus(data: Promise<any>){
-    return await data.then((res) => { 
-    let emoji: string = "🙂";
-    
-    switch (res ? res.type : '') {
-    case "PushEvent":
-      emoji = "🧱";
-      break;
-    case "CreateEvent":
-      emoji = "📌";
-      break;
-    case "WatchEvent":
-      emoji = "🔎";
-      break;
-    case "ForkEvent":
-      emoji = "🔨";
-      break;
-    case "IssuesEvent":
-      emoji = "📝";
-      break;
-    case "PullRequestEvent":
-      emoji = "🔧";
-      break;
-    case "ReleaseEvent":
-      emoji = "🎉";
-      break;
-    case "PullRequestReviewCommentEvent":
-      emoji = "💬";
-      break;
-    default:
-      emoji = "🙂";
-      break;
-    }
-    return emoji
-
-     })
-  }
 
   static styles = css`
   .single-post.panel {
@@ -198,53 +126,141 @@ a {
 }
   `
 
+  /**
+   * the github username
+   */
+   @property({type: String})
+   username = "wibus-wee"
+ 
+   /**
+    * limit number
+    */
+   @property({type: Number})
+   limit = 10
+ 
+   /**
+    * set background color
+    */
+   @property({type: String})
+   bgColor = "#fafafa"
+
+  /**
+   * set title color
+   */
+  @property({type: String})
+  titleColor = "#555"
+
+  /**
+   * set description color
+   */
+  @property({type: String})
+  descriptionColor = "#8b8b8b"
+
+  private async setCookie(key: string, value: string){
+    return await Cookies.set(key, value, { expires: 3600000 })
+  }
+  private getCookie(key: string) {
+    const data = Cookies.get(key)
+    return data ? JSON.parse(data) : []
+  }
+  private removeCookie(key: string) {
+    return Cookies.remove(key)
+  }
+
+  private async getData(){
+    // 发送请求，并带If-Modified-Since头部
+    const response = await $.get(`https://api.github.com/users/${this.username}/events?per_page=${this.limit}`, {
+      headers: {
+        'If-Modified-Since': "Thu, 05 Jul 2021 15:31:30 GMT"
+      }
+    })
+    let data = response.data
+    return await this.setCookie('github-dynamic', JSON.stringify(data))
+  }
+
+  private getStatus(data: any){
+    let emoji: string = "🙂";
+    
+    switch (data ? data : '') {
+    case "PushEvent":
+      emoji = "🧱";
+      break;
+    case "CreateEvent":
+      emoji = "📌";
+      break;
+    case "WatchEvent":
+      emoji = "🔎";
+      break;
+    case "ForkEvent":
+      emoji = "🔨";
+      break;
+    case "IssuesEvent":
+      emoji = "📝";
+      break;
+    case "PullRequestEvent":
+      emoji = "🔧";
+      break;
+    case "ReleaseEvent":
+      emoji = "🎉";
+      break;
+    case "PullRequestReviewCommentEvent":
+      emoji = "💬";
+      break;
+    default:
+      emoji = "🙂";
+      break;
+    }
+    return emoji
+  }
+
+  private returnDescription(data: any){
+    switch (data ? data.type : ''){
+      case "PushEvent":
+        return data.payload.commits[0].message
+      case "CreateEvent":
+        return data.payload.description
+      case "WatchEvent":
+        return data.payload.action + " in " + data.repo.name
+      case "ForkEvent":
+        return "From " + data.repo.name + " to " + data.payload.forkee.full_name
+      case "IssuesEvent":
+        return data.payload.action + " issue " + data.payload.issue.title
+      case "PullRequestEvent":
+        return data.payload.action + " pull request " + data.payload.pull_request.title
+      case "ReleaseEvent":
+        return data.payload.action + " release " + data.payload.release.name
+      case "PullRequestReviewCommentEvent":
+        return data.payload.action + " pull request " + data.payload.pull_request.title
+      default:
+        return "Null"
+    }
+  }
+
   private renderHTML(i: number){
     const bgTheme = {background: this.bgColor}
-    const data = this.getData(i).then((res) => {return res})
+    const data = this.getCookie('github-dynamic')
     return html`
       <div class="single-post panel box-shadow-wrap-normal" style=${styleMap(bgTheme)}>
   <div class="post-meta wrapper-lg"><div class="item-meta-ico bg-ico-emoji">
-    ${until(this.getStatus(data))}
+    ${this.getStatus(data[i].type)}
   </div>    
   <h2 class="m-t-none text-ellipsis index-post-title" style=${styleMap({color: this.titleColor})}>
-    <a href="${until(data.then((res) => {return res ? res.repo.url:'#'}), "Loading")}">
-    ${until(data.then((res) => {return res ? res.type:'Null'}), "Loading")}
+    <a href="${data[i]}.repo.url">
+    ${data[i].type}
       </a>
     </h2>
     <p class="summary l-h-2x" style=${styleMap({color: this.descriptionColor})}>
-    ${until(data.then((res) => {
-      switch (res ? res.type : ''){
-        case "PushEvent":
-          return res.payload.commits[0].message
-        case "CreateEvent":
-          return res.payload.description
-        case "WatchEvent":
-          return res.payload.action + " in " + res.repo.name
-        case "ForkEvent":
-          return "From " + res.repo.name + " to " + res.payload.forkee.full_name
-        case "IssuesEvent":
-          return res.payload.action + " issue " + res.payload.issue.title
-        case "PullRequestEvent":
-          return res.payload.action + " pull request " + res.payload.pull_request.title
-        case "ReleaseEvent":
-          return res.payload.action + " release " + res.payload.release.name
-        case "PullRequestReviewCommentEvent":
-          return res.payload.action + " pull request " + res.payload.pull_request.title
-        default:
-          return "Null"
-      }
-      
-    }), "Loading")}
+    ${this.returnDescription(data[i])}
     </p>
       <div class="line line-lg b-b b-light"></div>
 <div class="post-item-foot-icon text-ellipsis list-inline" style=${styleMap({color: this.descriptionColor})}>
 <li>
 <span class="m-r-sm right-small-icons"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-<a href="https://www.ihewro.com/author/1/">${until(data.then((res) => {return res ? res.repo.name:'Null'}), "Loading")}</a>
+<a href="https://www.ihewro.com/author/1/">${data[i].repo.name}</a>
 </li>
 
 <li><span class="right-small-icons m-r-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
-${until(data.then((res) => {return res ? res.created_at:'Null'}), "Loading")}
+${data[i].created_at}
 </li>
 </div><!--post-meta wrapper-lg-->
 </div>
@@ -253,6 +269,7 @@ ${until(data.then((res) => {return res ? res.created_at:'Null'}), "Loading")}
   }
 
   render() {
+    console.log(this.getData())
     let a: TemplateResult<1>[] = new Array(this.limit)
     for (let i = 0; i < this.limit; i++) {
       if (this.renderHTML(i) == null) {

@@ -40,21 +40,21 @@ import "wc-github-dynamic"
 <lantern-element></lantern-element>
 ```
 
+## Notice
+
+Because GitHub Rate limit, this component will set a cookie in browser, the validity period is 1 hour
+
 ## API
 
 ### Example
 
 ```html
-<lantern-element
-  number="2"
-  text="Good,Great"
-  disPlayBoth
-></lantern-element>
-<lantern-element
-  number="2"
-  position="right"
-  text="Good,Great"
-></lantern-element>
+<github-dynamic
+  username="iRoZhi"
+  limit="3"
+  bgColor="#fff"
+>
+</github-dynamic>
 ```
 
 <!-- wc-api:start -->

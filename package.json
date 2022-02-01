@@ -28,11 +28,13 @@
   },
   "dependencies": {
     "axios": "^0.25.0",
+    "js-cookie": "^3.0.1",
     "lit": "^2.0.2"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.5.7",
     "@custom-elements-manifest/to-markdown": "^0.1.0",
+    "@types/js-cookie": "^3.0.1",
     "@yunyoujun/utils": "^0.1.4",
     "esno": "^0.14.0",
     "fs": "^0.0.1-security",
