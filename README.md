@@ -1,8 +1,6 @@
 # GitHub Dynamic for Web Components
 
-[![npm](https://img.shields.io/npm/v/wc-github-dynamic)](https://www.npmjs.com/package/wc-github-dynamic)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/wc-github-dynamic)
-![jsDelivr hits (npm)](https://img.shields.io/jsdelivr/npm/hy/wc-github-dynamic)
+> 已弃坑，目前遇到的困难：无法异步获取GitHub动态数据，无法设置Cookie后再获取Cookie
 
 A web component by [lit](https://github.com/lit/lit)
 

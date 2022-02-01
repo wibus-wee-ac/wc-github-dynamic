@@ -201,8 +201,8 @@ a {
    * @param value value
    * @returns string
    */
-  private setCookie(key: string, value: any){
-    return Cookies.set(key, JSON.stringify(value), { expires: 3600000 })
+  private async setCookie(key: string, value: any){
+    return await Cookies.set(key, JSON.stringify(value), { expires: 3600000 })
   }
   /**
    * get the cookie
@@ -221,8 +221,8 @@ a {
   private async getData(){
     // const { data } = await $.get(`https://api.github.com/users/${this.username}/events?per_page=${this.limit}`)
     const data = [{"id":"19544394873","type":"WatchEvent","actor":{"id":37916737,"login":"iRoZhi","display_login":"iRoZhi","gravatar_id":"","url":"https://api.github.com/users/iRoZhi","avatar_url":"https://avatars.githubusercontent.com/u/37916737?"},"repo":{"id":151233668,"name":"ArtalkJS/Artalk","url":"https://api.github.com/repos/ArtalkJS/Artalk"},"payload":{"action":"started"},"public":true,"created_at":"2022-01-01T15:28:47Z","org":{"id":76841221,"login":"ArtalkJS","gravatar_id":"","url":"https://api.github.com/orgs/ArtalkJS","avatar_url":"https://avatars.githubusercontent.com/u/76841221?"}},{"id":"19544393108","type":"WatchEvent","actor":{"id":37916737,"login":"iRoZhi","display_login":"iRoZhi","gravatar_id":"","url":"https://api.github.com/users/iRoZhi","avatar_url":"https://avatars.githubusercontent.com/u/37916737?"},"repo":{"id":345120700,"name":"qwqcode/Atracer","url":"https://api.github.com/repos/qwqcode/Atracer"},"payload":{"action":"started"},"public":true,"created_at":"2022-01-01T15:28:19Z"},{"id":"19542725000","type":"WatchEvent","actor":{"id":37916737,"login":"iRoZhi","display_login":"iRoZhi","gravatar_id":"","url":"https://api.github.com/users/iRoZhi","avatar_url":"https://avatars.githubusercontent.com/u/37916737?"},"repo":{"id":390218088,"name":"iRoZhi/concise_orange","url":"https://api.github.com/repos/iRoZhi/concise_orange"},"payload":{"action":"started"},"public":true,"created_at":"2022-01-01T07:56:35Z"},{"id":"19542724944","type":"WatchEvent","actor":{"id":37916737,"login":"iRoZhi","display_login":"iRoZhi","gravatar_id":"","url":"https://api.github.com/users/iRoZhi","avatar_url":"https://avatars.githubusercontent.com/u/37916737?"},"repo":{"id":390180296,"name":"iRoZhi/imouse","url":"https://api.github.com/repos/iRoZhi/imouse"},"payload":{"action":"started"},"public":true,"created_at":"2022-01-01T07:56:34Z"},{"id":"19542724862","type":"WatchEvent","actor":{"id":37916737,"login":"iRoZhi","display_login":"iRoZhi","gravatar_id":"","url":"https://api.github.com/users/iRoZhi","avatar_url":"https://avatars.githubusercontent.com/u/37916737?"},"repo":{"id":416741705,"name":"iRoZhi/GithubFile","url":"https://api.github.com/repos/iRoZhi/GithubFile"},"payload":{"action":"started"},"public":true,"created_at":"2022-01-01T07:56:32Z"}]
-    console.log(data)
-    return this.setCookie('github-dynamic-' + this.username, data)
+    // console.log(await data)
+    return await this.setCookie('github-dynamic-' + this.username, await data)
   }
 
   /**
@@ -300,9 +300,10 @@ a {
    */
   private renderHTML(i: number){ // it must be TemplateResult<1>
     const bgTheme = {background: this.bgColor}
-    // console.log(this.getData())
-    this.getCookie('github-dynamic-' + this.username).length == 0 ? console.log( this.getData() ) : this.getCookie('github-dynamic-' + this.username)
     let data = this.getCookie('github-dynamic-' + this.username)
+    if (data.length == 0) {
+      console.warn("No data")
+    }
     return html`
     <div class="panel-heading single-post panel box-shadow-wrap-normal">
     ${data[i].actor.login}
@@ -336,6 +337,11 @@ ${data[i].created_at}
   }
 
   render() {
+    
+    this.getCookie('github-dynamic-' + this.username).length == 0 ? 
+    console.log( this.getData() ) : 
+    console.log( this.getCookie('github-dynamic-' + this.username) )
+
     let a: TemplateResult<1>[] = new Array(this.limit)
     for (let i = 0; i < this.limit; i++) {
       if (this.renderHTML(i) == null) {
