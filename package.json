@@ -14,7 +14,7 @@
   "keywords": [
     "webcomponents",
     "lit",
-    "lantern"
+    "github-dynamic"
   ],
   "scripts": {
     "dev": "vite",
